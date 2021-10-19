@@ -1,20 +1,37 @@
 document.getElementById("imageUpload").onclick = function () {
-    let xhttp = new XMLHttpRequest(); // create new AJAX request
+  let xhttp = new XMLHttpRequest(); // create new AJAX request
 
-    xhttp.onreadystatechange = function () {
-        if (this.status == 200) {
-            document.getElementById(
-                "imageStatus"
-            ).innerHTML = this.responseText;
-        } else {
-            document.getElementById("imageStatus").innerHTML =
-                "مشکلی از سمت سرور رخ داده است";
-        }
-    };
+  const selectedImage = document.getElementById("selectedImage");
+  const imageStatus = document.getElementById("imageStatus");
+  const progressDiv = document.getElementById("progressDiv");
+  const progressBar = document.getElementById("progressBar");
 
-    xhttp.open("POST", "/dashboard/image-upload");
-    let formData = new FormData();
+  xhttp.onreadystatechange = function () {
+    imageStatus.innerHTML = this.responseText;
+  };
 
-    formData.append("image", document.getElementById("selectedImage").files[0]);
+  xhttp.open("POST", "/dashboard/image-upload");
+
+  xhttp.upload.onprogress = function (e) {
+    if (e.lengthComputable) {
+      let result = Math.floor((e.loaded / e.total) * 100);
+      // console.log(result + "%");
+      if (result !== 100) {
+        progressBar.innerHTML = result + "%";
+        progressBar.style = "width:" + result + "%";
+      } else {
+        progressDiv.style = "display: none";
+      }
+    }
+  };
+
+  let formData = new FormData();
+
+  if (selectedImage.files.length > 0) {
+    progressDiv.style = "display: block";
+    formData.append("image", selectedImage.files[0]);
     xhttp.send(formData);
+  } else {
+    imageStatus.innerHTML = "برای آپلود باید عکسی انتخاب کنید";
+  }
 };

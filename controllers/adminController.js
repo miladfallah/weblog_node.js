@@ -64,6 +64,8 @@ exports.uploadImage = (req, res) => {
     storage: storage,
     fileFilter: fileFilter,
   }).single("image");
+  //req.file
+  // console.log(req.file)
 
   upload(req, res, (err) => {
     if (err) {
