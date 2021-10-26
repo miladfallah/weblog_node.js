@@ -29,6 +29,7 @@
         "node-fetch": "^2.6.1",
         "passport": "^0.4.1",
         "passport-local": "^1.0.0",
+        "sharp": "^0.29.2",
         "uuid": "^8.3.2",
         "winston": "^3.3.3",
         "yup": "^0.29.3"
