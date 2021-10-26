@@ -1,6 +1,6 @@
 const multer = require("multer");
 const sharp = require("sharp");
-const uuid = require("uuid").v4;
+const shortid = require("shortid");
 
 const Blog = require("../models/Blog");
 const { formatDate } = require("../utils/jalali");
@@ -71,18 +71,20 @@ exports.uploadImage = (req, res) => {
 
   upload(req, res, async (err) => {
     if (err) {
-      res.send(err);
+      if (err.code === "LIMIT_FILE_SIZE") {
+        res.status(400).send("حجم عکس باید کمتر از 4 مگابایت باشد.");
+      }
+      res.status(400).send(err);
     } else {
       if (req.file) {
-        console.log(req.file);
-        const fileName = `${uuid()}_${req.file.originalname}`;
+        const fileName = `${shortid.generate()}_${req.file.originalname}`;
         await sharp(req.file.buffer)
           .jpeg({
             quality: 60,
           })
           .toFile(`./public/uploads/${fileName}`)
           .catch((err) => console.log(err));
-        res.status(200).send("آپلود عکس موفقیت آمیز بود");
+        res.status(200).send(`http://localhost:3000/uploads/${fileName}`);
       } else {
         res.send("جهت آپلود باید عکسی انتخاب کنید");
       }
