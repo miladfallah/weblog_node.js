@@ -97,6 +97,15 @@ exports.editPost = async (req, res) => {
   }
 };
 
+exports.deletePost = async (req, res) => {
+  try {
+    const result = await Blog.findByIdAndRemove(req.params.id);
+    res.redirect("/dashboard");
+  } catch (err) {
+    res.render("errors/500");
+  }
+};
+
 exports.createPost = async (req, res) => {
   const errorArr = [];
 
