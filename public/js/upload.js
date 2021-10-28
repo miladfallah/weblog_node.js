@@ -7,10 +7,13 @@ document.getElementById("imageUpload").onclick = function () {
   const progressBar = document.getElementById("progressBar");
   const uploadResult = document.getElementById("uploadResult");
 
+  // xhttp.responseType = "json";
+
   xhttp.onreadystatechange = function () {
     if (xhttp.status === 200) {
-      imageStatus.innerHTML = "اپلود عکس موفقیت امیز بود.";
-      uploadResult.innerHTML = this.responseText;
+      imageStatus.innerHTML = "آپلود عکس موفقیت آمیز بود"; //this.response.message
+      uploadResult.innerHTML = this.responseText; //this.response.address
+      selectedImage.value = ""; //? Input file clear
     } else {
       imageStatus.innerHTML = this.responseText;
     }

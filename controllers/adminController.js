@@ -1,11 +1,11 @@
 const multer = require("multer");
 const sharp = require("sharp");
-const shortid = require("shortid");
+const shortId = require("shortid");
 
 const Blog = require("../models/Blog");
 const { formatDate } = require("../utils/jalali");
 const { get500 } = require("./errorController");
-const { storage, fileFilter } = require("../utils/multer");
+const { fileFilter } = require("../utils/multer");
 
 exports.getDashboard = async (req, res) => {
   try {
@@ -32,6 +32,69 @@ exports.getAddPost = (req, res) => {
     layout: "./layouts/dashLayout",
     fullname: req.user.fullname,
   });
+};
+
+exports.getEditPost = async (req, res) => {
+  const post = await Blog.findOne({
+    _id: req.params.id,
+  });
+
+  if (!post) {
+    return res.redirect("errors/404");
+  }
+
+  if (post.user.toString() != req.user._id) {
+    return res.redirect("/dashboard");
+  } else {
+    res.render("private/editPost", {
+      pageTitle: "بخش مدیریت | ویرایش پست",
+      path: "/dashboard/edit-post",
+      layout: "./layouts/dashLayout",
+      fullname: req.user.fullname,
+      post,
+    });
+  }
+};
+
+exports.editPost = async (req, res) => {
+  const errorArr = [];
+
+  const post = await Blog.findOne({ _id: req.params.id });
+  try {
+    await Blog.postValidation(req.body);
+
+    if (!post) {
+      return res.redirect("errors/404");
+    }
+
+    if (post.user.toString() != req.user._id) {
+      return res.redirect("/dashboard");
+    } else {
+      const { title, status, body } = req.body;
+      post.title = title;
+      post.status = status;
+      post.body = body;
+
+      await post.save();
+      return res.redirect("/dashboard");
+    }
+  } catch (err) {
+    console.log(err);
+    err.inner.forEach((e) => {
+      errorArr.push({
+        name: e.path,
+        message: e.message,
+      });
+    });
+    res.render("private/editPost", {
+      pageTitle: "بخش مدیریت | ویرایش پست",
+      path: "/dashboard/edit-post",
+      layout: "./layouts/dashLayout",
+      fullname: req.user.fullname,
+      errors: errorArr,
+      post,
+    });
+  }
 };
 
 exports.createPost = async (req, res) => {
@@ -72,12 +135,14 @@ exports.uploadImage = (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
       if (err.code === "LIMIT_FILE_SIZE") {
-        res.status(400).send("حجم عکس باید کمتر از 4 مگابایت باشد.");
+        return res
+          .status(400)
+          .send("حجم عکس ارسالی نباید بیشتر از 4 مگابایت باشد");
       }
       res.status(400).send(err);
     } else {
       if (req.file) {
-        const fileName = `${shortid.generate()}_${req.file.originalname}`;
+        const fileName = `${shortId.generate()}_${req.file.originalname}`;
         await sharp(req.file.buffer)
           .jpeg({
             quality: 60,
