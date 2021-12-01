@@ -2,7 +2,6 @@ const path = require("path");
 
 const debug = require("debug")("weblog-project");
 const fileUpload = require("express-fileupload");
-const bodyParser = require("body-parser");
 const express = require("express");
 const mongoose = require("mongoose");
 const expressLayout = require("express-ejs-layouts");
