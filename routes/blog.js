@@ -12,4 +12,16 @@ router.get("/", blogController.getIndex);
 //  @route  GET /post/:id
 router.get("/post/:id", blogController.getSinglePost);
 
+//  @desc   Weblog Contact Page
+//  @route  GET /contact
+router.get("/contact", blogController.getContactPage);
+
+//  @desc   Weblog Numric Captcha
+//  @route  GET /captcha.png
+router.get("/captcha.png", blogController.getCaptcha);
+
+//  @desc   Handle Contact Page
+//  @route  POST /contact
+router.post("/contact", blogController.handleContactPage);
+
 module.exports = router;
